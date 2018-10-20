@@ -24,7 +24,12 @@ char *lsh_read_line(void)
     position ++;
 
     if (position >= bufsize){
-      bufsize += 
+      bufsize +=  LSH_RL_BUFSIZE;
+      buffer = realloc(buffer, bufsize);
+      if (!buffer){
+        fprintf(stderr, 'lsh: allocation error\n');
+        exit(EXIT_FAILURE);
+      }
     }
   }
 }
