@@ -33,6 +33,17 @@ char *lsh_read_line(void)
     }
   }
 }
+#define LSH_TOK_BUFSIZE 64
+#define LSH_TOK_DELIM '\t\r\n\a'
+
+int bufsize = LSH_TOK_BUFSIZE, positon 0);
+char **tokens = malloc(bufsize * sizeof(char*));
+char *token, **tokens_backup;
+
+if(!tokens){
+  fpritnf(stderr, "lsh: allocation eror\n");
+  exit(EXIT_FAILURE);
+}
 
 void lsh_loop(void)
 {
