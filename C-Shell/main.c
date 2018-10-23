@@ -1,3 +1,10 @@
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 int lsh_cd(char **args);
 int lsh_help(char **args);
 int lsh_exit(char **args);
@@ -36,18 +43,20 @@ int lsh_help(char **args){
   printf("Type program names and arguments, and hit enter. \n");
   printf("The following are built in: \n");
 
-  for (i = 0; i < lsh_num_builtins; i++){
-      printf('&s\n', builtin_str[1]);
+  for (i = 0; i < lsh_num_builtins(); i++){
+      printf(" %s\n", builtin_str[i]);
   }
   printf("Use the man command for information on other programs.\n");
   return 1;
 }
 
-int lsh_exit(char **args){
+int lsh_exit(char **args)
+{
   return 0;
 }
 
-int lsh_launch(char **args){
+int lsh_launch(char **args)
+{
   pid_t pid, wpid;
   int status;
 
@@ -62,7 +71,7 @@ int lsh_launch(char **args){
     perror("lsh");
   } else {
     do {
-      wpid = waitpid(pid, %status, WUNTRACED);
+      waitpid(pid, &status, WUNTRACED);
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
   }
   return 1;
@@ -80,7 +89,7 @@ int lsh_execute(char **args)
       return (*builtin_func[i])(args);
     }
   }
-  return lsh_launcher(args);
+  return lsh_launch(args);
 }
 
 #define LSH_RL_BUFSIZE 1024
@@ -100,8 +109,10 @@ char *lsh_read_line(void)
   while (1){
     c = getchar();
 
-    if (c === EOF || c == '\n') {
-      buffer[positon] = '\0';
+    if (c == EOF ) {
+      exit(EXIT_FAILURE);
+    } else if (c =='\n'){
+      buffer[position] = '\0';
       return buffer;
     }else {
       buffer[position] = c;
@@ -112,7 +123,7 @@ char *lsh_read_line(void)
       bufsize +=  LSH_RL_BUFSIZE;
       buffer = realloc(buffer, bufsize);
       if (!buffer){
-        fprintf(stderr, 'lsh: allocation error\n');
+        fprintf(stderr, "lsh: allocation error\n");
         exit(EXIT_FAILURE);
       }
     }
@@ -121,29 +132,31 @@ char *lsh_read_line(void)
 
 
 #define LSH_TOK_BUFSIZE 64
-#define LSH_TOK_DELIM '\t\r\n\a'
+#define LSH_TOK_DELIM "\t\r\n\a"
 
 char **lsh_split_line(char *line)
 {
 
-  int bufsize = LSH_TOK_BUFSIZE, positon 0);
+  int bufsize = LSH_TOK_BUFSIZE, position = 0;
   char **tokens = malloc(bufsize * sizeof(char*));
   char *token, **tokens_backup;
 
   if(!tokens){
-    fpritnf(stderr, "lsh: allocation eror\n");
+    fprintf(stderr, "lsh: allocation eror\n");
     exit(EXIT_FAILURE);
   }
   token = strtok(line, LSH_TOK_DELIM);
   while (token != NULL){
-    tokens[postion] = token;
-    position ++;
+    tokens[position] = token;
+    position++;
 
     if (position >= bufsize){
       bufsize += LSH_TOK_BUFSIZE;
-      tokens = realloc(tokens, bufsize * sizeof(char*))
+      tokens_backup = tokens;
+      tokens = realloc(tokens, bufsize * sizeof(char*));
       if (!tokens){
-        fprintf( stderr, 'lsh: allocation error \n');
+        free(tokens_backup);
+        fprintf( stderr, "lsh: allocation error \n");
         exit(EXIT_FAILURE);
       }
     }
@@ -160,7 +173,7 @@ void lsh_loop(void)
   int status;
 
   do {
-    print("> ");
+    printf("> ");
     line = lsh_read_line();
     args = lsh_split_line(line);
     status = lsh_execute(args);
