@@ -1,4 +1,5 @@
 ;;kernel.asm
+
 bits 32                ;nasm directive - 32 bit
 section .text
 
@@ -13,4 +14,4 @@ start:
 
 section .bss
 resb 8192               ;8KM for stack
-stack_space; 
+stack_space;b 

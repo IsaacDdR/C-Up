@@ -7,7 +7,7 @@ void kmain (void)
 
 
     while(j < 80 * 25 * 2){
-      vidptr[j] = " ";
+      vidptr[j] = ' ';
 
       vidptr[j+1] = 0x07;
       j = j + 2;
